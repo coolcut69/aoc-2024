@@ -1,11 +1,4 @@
-
-fun maxOfInts(leftInt: Int, rightInt: Int) : Int{
-    return if (leftInt > rightInt) {
-        leftInt - rightInt
-    } else {
-        rightInt - leftInt
-    }
-}
+import kotlin.math.abs
 
 fun main() {
 
@@ -13,14 +6,14 @@ fun main() {
         val leftList = ArrayList<Int>()
         val rightList = ArrayList<Int>()
         for (s in input) {
-            leftList.add(s.split("   ")[0].toInt())
-            rightList.add(s.split("   ")[1].toInt())
+            leftList.add(s.substringBefore(" ").toInt())
+            rightList.add(s.substringAfterLast(" ").toInt())
         }
         leftList.sort()
         rightList.sort()
         var sum: Int = 0
         for ((index, i) in leftList.withIndex()) {
-            sum += maxOfInts(i, rightList[index])
+            sum += abs(i - rightList[index])
         }
         return sum
     }
@@ -29,8 +22,8 @@ fun main() {
         val leftList = ArrayList<Int>()
         val rightList = ArrayList<Int>()
         for (s in input) {
-            leftList.add(s.split("   ")[0].toInt())
-            rightList.add(s.split("   ")[1].toInt())
+            leftList.add(s.substringBefore(" ").toInt())
+            rightList.add(s.substringAfterLast(" ").toInt())
         }
         var sum: Int = 0
         for (i in leftList) {
