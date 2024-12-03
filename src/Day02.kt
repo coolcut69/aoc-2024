@@ -1,52 +1,56 @@
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
+private fun parse(input: List<String>): List<List<Int>> =
+    input.map { row ->
+        row.split(" ").map { it.toInt() }
+    }
+
 fun main() {
 
-    fun part1(reports: List<String>): Int {
-        var validReports = 0
-        for (report in reports) {
-            var validReport = true
-            val split = report.split(" ").map { it.toInt() }
+    fun isReportSafe(split: List<Int>): Boolean {
+        for (i in 0..split.size - 3) {
+            val diffOne = split[i] - split[i + 1]
+            val diffTwo = split[i + 1] - split[i + 2]
 
-            val windowed = split.windowed(3)
-
-            for (ints in windowed) {
-                val diffOne = ints[0] - ints[1]
-                val diffTwo = ints[1] - ints[2]
-//                println(diffTwo)
-//                println(diffOne)
-                if (diffTwo.absoluteValue > 3 || diffOne.absoluteValue > 3) {
-                    validReport = false
-                }
-                if (diffTwo.sign != diffOne.sign) {
-                    validReport = false
-                }
-
+            if (diffOne.absoluteValue > 3) {
+                return false
             }
-            if (validReport) {
-                validReports++
+
+            if (diffTwo.absoluteValue > 3) {
+                return false
+            }
+
+            if (diffOne.sign != diffTwo.sign) {
+                return false
             }
         }
-
-        return validReports
+        return true
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun part1(reports: List<String>): Int {
+        return parse(reports).count { isReportSafe(it) }
     }
 
-    // Test if implementation meets criteria from the description, like:
-//    check(part1(listOf("test_input")) == 1)
+    fun isSafeDampened(report: List<Int>): Boolean {
+        return report.indices.any { removeThis ->
+            isReportSafe(report.filterIndexed { index, _ -> removeThis != index })
+        }
+    }
+
+    fun part2(reports: List<String>): Int {
+        return parse(reports).count { isSafeDampened(it) }
+    }
 
     // Or read a large test input from the `src/Day01_test.txt` file:
     val testInput = readInput("Day02_test")
-    println(part1(testInput))
     check(part1(testInput) == 2)
-//    check(part2(testInput) == 31)
+    check(part2(testInput) == 4)
 
     // Read the input from the `src/Day01.txt` file.
     val input = readInput("Day02")
     part1(input).println()
+    check(part1(input) == 356)
     part2(input).println()
+    check(part2(input) == 413)
 }
