@@ -1,103 +1,67 @@
-enum class Direction {
-    NORTH, SOUTH, WEST, EAST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORD_WEST
-}
+class Day04(private val input: List<String>) {
 
-private fun Char.isX(): Boolean {
-    return this == 'X'
-}
+    fun solvePart1(): Int =
+        input.flatMapIndexed { y, row ->
+            row.mapIndexed { x, c ->
+                if (c == 'X') {
+                    ALL_DIRECTIONS.count { vector ->
+                        vectorFind("XMAS", x, y, vector)
+                    }
+                } else 0
+            }
+        }.sum()
 
-private fun Char.isM(): Boolean {
-    return this == 'M'
-}
+    fun solvePart2(): Int =
+        input.flatMapIndexed { y, row ->
+            row.mapIndexed { x, c ->
+                if (c == 'A') {
+                    CORNERS
+                        .map { (dx, dy) -> input.safeAt(x + dx, y + dy) }
+                        .joinToString("") in setOf("MMSS", "MSSM", "SSMM", "SMMS")
+                } else false
+            }
+        }.count { it }
 
-private fun Char.isA(): Boolean {
-    return this == 'A'
-}
+    private fun List<String>.safeAt(x: Int, y: Int): Char =
+        if (y in indices && x in this[y].indices) this[y][x] else ' '
 
-private fun Char.isS(): Boolean {
-    return this == 'S'
-}
+    private tailrec fun vectorFind(target: String, x: Int, y: Int, vector: Pair<Int, Int>): Boolean =
+        when {
+            target.isEmpty() -> true
+            target.first() != input.safeAt(x, y) -> false
+            else -> vectorFind(target.substring(1), x + vector.first, y + vector.second, vector)
+        }
 
+    private companion object {
+        val ALL_DIRECTIONS = listOf(
+            -1 to -1, -1 to 0, -1 to 1,
+            0 to -1, 0 to 1,
+            1 to -1, 1 to 0, 1 to 1
+        )
+        val CORNERS = listOf(-1 to -1, -1 to 1, 1 to 1, 1 to -1)
+    }
+
+}
 
 fun main() {
 
     fun part1(input: List<String>): Int {
-        val width = input[0].length
-        val height = input.size
-        println("width $width")
-        println("height $height")
-        var count = 0
-
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val lengthOfXmas = 4
-                if (y - lengthOfXmas >= -1) {
-                    if (input[y][x].isX() && input[y - 1][x].isM() && input[y - 2][x].isA() && input[y - 3][x].isS()) {
-                        println("x $y, y $x NORTH")
-                        count++
-                    }
-                }
-                if (y - lengthOfXmas >= -1 && x + lengthOfXmas <= width) {
-                    if (input[y][x].isX() && input[y - 1][x + 1].isM() && input[y - 2][x + 2].isA() && input[y - 3][x + 3].isS()) {
-                        println("x $y, y $x NORTH_EAST")
-                        count++
-                    }
-                }
-                if (x + lengthOfXmas <= width) {
-                    if (input[y][x].isX() && input[y][x + 1].isM() && input[y][x + 2].isA() && input[y][x + 3].isS()) {
-                        println("x $y, y $x EAST")
-                        count++
-                    }
-                }
-                if (y + lengthOfXmas <= height && x + lengthOfXmas <= width) {
-                    if (input[y][x].isX() && input[y + 1][x + 1].isM() && input[y + 2][x + 2].isA() && input[y + 3][x + 3].isS()) {
-                        println("x $y, y $x SOUTH_EAST")
-                        count++
-                    }
-                }
-                if (y + lengthOfXmas <= height) {
-                    if (input[y][x].isX() && input[y + 1][x].isM() && input[y + 2][x].isA() && input[y + 3][x].isS()) {
-                        println("x $y, y $x SOUTH")
-                        count++
-                    }
-                }
-                if (y + lengthOfXmas <= height && x - lengthOfXmas >= -1) {
-                    if (input[y][x].isX() && input[y + 1][x - 1].isM() && input[y + 2][x - 2].isA() && input[y + 3][x - 3].isS()) {
-                        println("x $y, y $x SOUTH_WEST")
-                        count++
-                    }
-                }
-                if (x - lengthOfXmas >= -1) {
-                    if (input[y][x].isX() && input[y][x - 1].isM() && input[y][x - 2].isA() && input[y][x - 3].isS()) {
-                        println("x $y, y $x WEST")
-                        count++
-                    }
-                }
-                if (y - lengthOfXmas >= -1 && x - lengthOfXmas >= -1) {
-                    if (input[y][x].isX() && input[y - 1][x - 1].isM() && input[y - 2][x - 2].isA() && input[y - 3][x - 3].isS()) {
-                        println("x $y, y $x NORTH_WEST")
-                        count++
-                    }
-                }
-            }
-
-        }
-        return count
+        return Day04(input).solvePart1()
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        return Day04(input).solvePart2()
     }
 
     val testInput = readInput("Day04_test")
 
     check(part1(testInput) == 18)
-    check(part2(testInput) == 0)
+    check(part2(testInput) == 9)
 
     // Read the input from the `src/Day01.txt` file.
     val input = readInput("Day04")
-    check(part1(input) == 0)
-//    check(part2(input) == 0)
+    check(part1(input) == 2427)
+    check(part2(input) == 1900)
 }
 
 
